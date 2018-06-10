@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, Button, TextInput, Dimensions, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Button, TextInput, Dimensions, TouchableOpacity, AsyncStorage } from 'react-native';
 import styled from 'styled-components';
 import Base64 from '../lib/Base64'
 
@@ -15,23 +15,72 @@ export default class Home extends React.Component {
     super(props);
     this.state = { id : '', password : '' };
   }
-  handleSubmit() {
-    //전송
-    // alert(JSON.stringify(this.state,0,2));
+  async handleSubmit() {
+
+    //id와 password로 DB검색 : DB가 하는 일
+    function getUser(id, password) {
+      let users = require('./users.json');
+      let user = [];
+      for(let i in users){
+        if(id === users[i].id && password === users[i].password)
+        user.push(users[i]);
+      }
+      return user;
+    }
+
+    //서버 로직 함수 : post 이후 처리
+    async function serverFn(pId, pPassword) {
+      //서버 로직 start
+      let id = pId
+      let password = pPassword;
+      password = Base64.btoa(password);
+
+      //id와 password로 DB검색
+      let user = await getUser(id, password);
+
+      //없을 경우
+      if(user.length === 0) {
+        return {status : 'ERROR', message : "아이디와 비밀번호를 확인하세요"};
+      }
+
+      //DB 무결성 에러
+      if(user.length !== 1) {
+        return {status : 'ERROR', message : "DB ERROR"};
+      }
+
+      let key = {
+        login : true,
+        id : result.id
+      }
+      key = Base64.btoa(JSON.stringify(key,0,2));
+
+      return {status : 'SUCCESS', data : {key : key}};
+    }
+
+    //서버 전송
+    result = await serverFn(this.state.id, this.state.password);
+    
+    if(result.status === 'ERROR'){
+      alert(result.message);
+      return;
+    }
+
     //fetch 생략
+    const key = result.key;
 
-    //서버 로직
-    let id = this.state.id;
-    let password = this.state.password;
-    password = Base64.btoa(password);
+    try {
+      AsyncStorage.setItem('@RouteTestKey', key);
+      //넘어가기
+      this.props.navigation.navigate('page2');
+    } catch (error) {
+      // Error saving data
+    }
+    // alert(key);
 
-    //id와 password로 DB검색 결과
-    let result = require('./users.json');
-
-    alert(result)
+    // alert(result)
     // alert(Base64.atob(result[0].password));
     
-    alert(JSON.stringify(result,0,2));
+    // alert(JSON.stringify(result,0,2));
   }
 
   render() {
@@ -39,7 +88,7 @@ export default class Home extends React.Component {
       <Container>
         <TextL>Sign In</TextL>
         <Input
-          onChangeText={(text) => this.setState({id:text})}
+          onChangeText={(text) => this.setState({id:text.toLowerCase()})}
           value={this.state.id}
           placeholder="ID"
           placeholderTextColor="white"
