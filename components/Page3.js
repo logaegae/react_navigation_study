@@ -2,8 +2,9 @@ import React from 'react';
 import { StyleSheet, Text, View, Button, TouchableOpacity, AsyncStorage } from 'react-native';
 import styled from 'styled-components';
 import { auth } from '../helper/Member';
+import { LoginConsumer } from '../context';
 
-export default class Home extends React.Component {
+class LogOut extends React.Component {
 
   state = {
     id :'',
@@ -23,7 +24,8 @@ export default class Home extends React.Component {
   async handleLogout() {
     try {
       await AsyncStorage.removeItem('@RouteTest:key');
-      this.props.navigation.navigate('SignIn');
+      this.props.actions.logout();
+      this.props.navigation.navigate('Home');
     } catch (error) {
         alert("Error saving data" + error);
     }
@@ -79,3 +81,19 @@ const TextM = styled.Text`
   padding : 10px;
   color : white;
 `;
+
+const LogOutContainer = ({navigation}) => (
+  <LoginConsumer>
+    {
+      ({state, actions}) => (
+        <LogOut 
+          state={state}
+          actions={actions}
+          navigation={navigation}
+        />
+      )
+    }
+  </LoginConsumer>
+)
+
+export default LogOutContainer

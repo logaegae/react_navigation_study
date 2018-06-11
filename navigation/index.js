@@ -40,7 +40,7 @@ const DrawerNavi1 = createDrawerNavigator({
         }
     }
 },{
-    drawerPosition : 'left',
+    drawerPosition : 'right',
     getCustomActionCreators: (route, stateKey) => {
         return {
           toggleLeftDrawer: () => DrawerActions.toggleDrawer({ key: stateKey }),

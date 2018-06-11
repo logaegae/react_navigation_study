@@ -1,6 +1,7 @@
 import React from 'react'
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import styled from 'styled-components'
+import { LoginConsumer } from '../context';
 
 const items = [
   { name: 'Home'},
@@ -30,6 +31,15 @@ export default class Home extends React.Component {
     return (
       <Container>
         <TextL>Menu 1</TextL>
+        <LoginConsumer>
+          {
+            ({ state, actions }) => (
+              <TextL>
+                {state.id}
+              </TextL>
+            )
+          }
+        </LoginConsumer>
         {items.map(this.List)}
         <ListButton
           onPress={() => this.props.navigation.toggleRightDrawer()}

@@ -2,10 +2,11 @@ import React from 'react';
 import { StyleSheet, Text, View, Button, TextInput, Dimensions, TouchableOpacity, AsyncStorage } from 'react-native';
 import styled from 'styled-components';
 import { login } from '../lib/ServerFn';
+import { LoginConsumer } from '../context';
 
 const {height, width} = Dimensions.get('window');
 
-export default class Home extends React.Component {
+class SignIn extends React.Component {
 
   static navigationOptions = {
     drawerLabel: 'Page1'
@@ -30,7 +31,8 @@ export default class Home extends React.Component {
     const key = result.data.key;
     try {
       await AsyncStorage.setItem('@RouteTest:key', key);
-      this.props.navigation.navigate('Page2');
+      this.props.actions.login(this.state.id);
+      this.props.navigation.navigate('Welcome');
     } catch (error) {
       alert("Error saving data" + error);
     }
@@ -106,3 +108,19 @@ const TextM = styled.Text`
   padding : 10px;
   color : white;
 `;
+
+const SignInContainer = ({navigation}) => (
+  <LoginConsumer>
+    {
+      ({state, actions}) => (
+        <SignIn 
+          state={state}
+          actions={actions}
+          navigation={navigation}
+        />
+      )
+    }
+  </LoginConsumer>
+)
+
+export default SignInContainer;
