@@ -18,11 +18,26 @@ const styles = StyleSheet.create({
 
 
 const DrawerNavi1 = createDrawerNavigator({
-    Home : { 
+    Home1 : { 
         screen : Home
     },
-    Page1 : { 
-        screen : Page1
+    SignIn : { 
+        screen : Page1,
+        navigationOptions: {
+            title: 'SignIn'
+        }
+    },
+    Welcome : { 
+        screen : Page2,
+        navigationOptions: {
+            title: 'Welcome'
+        }
+    },
+    LogOut : { 
+        screen : Page3,
+        navigationOptions: {
+            title: 'LogOut'
+        }
     }
 },{
     drawerPosition : 'left',
@@ -53,34 +68,13 @@ const DrawerNavi2 = createDrawerNavigator({
 });
 
 const StackNavi1 = createStackNavigator({
-    Left : { 
-        screen : DrawerNavi1,
-    },
     Right : { 
-        screen : DrawerNavi2,
+        screen : DrawerNavi1,
     },
     Home : { 
         screen : Home,
         navigationOptions: {
             title: 'Home1'
-        }
-    },
-    Page1 : { 
-        screen : Page1,
-        navigationOptions: {
-            title: 'Page1'
-        }
-    },
-    Page2 : { 
-        screen : Page2,
-        navigationOptions: {
-            title: 'Page2'
-        }
-    },
-    Page3 : { 
-        screen : Page3,
-        navigationOptions: {
-            title: 'Page3'
         }
     }
   },{
@@ -96,18 +90,6 @@ const StackNavi1 = createStackNavigator({
           fontSize : 20
         },
         headerRight : (
-            <TouchableOpacity onPress={() => {navigation.dispatch(
-                DrawerActions.toggleDrawer({ key: navigation.state.key })
-            );}}>
-                <Ionicons
-                    style={styles.menu}
-                    name="md-menu" 
-                    size={25}
-                    color="white"
-                />
-            </TouchableOpacity>
-        ),
-        headerLeft : (
             <TouchableOpacity onPress={() => {navigation.dispatch(
                 DrawerActions.toggleDrawer({ key: navigation.state.key })
             );}}>

@@ -4,9 +4,9 @@ import styled from 'styled-components'
 
 const items = [
   { name: 'Home'},
-  { name: 'Page1'},
-  { name: 'Page2'},
-  { name: 'Page3'},
+  { name: 'SignIn'},
+  { name: 'Welcome'},
+  { name: 'LogOut'},
 ]
 
 export default class Home extends React.Component {

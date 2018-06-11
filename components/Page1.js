@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, Button, TextInput, Dimensions, TouchableOpacity, AsyncStorage } from 'react-native';
 import styled from 'styled-components';
-import Base64 from '../lib/Base64'
+import { login } from '../lib/ServerFn';
 
 const {height, width} = Dimensions.get('window');
 
@@ -17,70 +17,23 @@ export default class Home extends React.Component {
   }
   async handleSubmit() {
 
-    //id와 password로 DB검색 : DB가 하는 일
-    function getUser(id, password) {
-      let users = require('./users.json');
-      let user = [];
-      for(let i in users){
-        if(id === users[i].id && password === users[i].password)
-        user.push(users[i]);
-      }
-      return user;
-    }
+    //handleSubmit 함수 시작
+    let result = await login(this.state.id, this.state.password);
 
-    //서버 로직 함수 : post 이후 처리
-    async function serverFn(pId, pPassword) {
-      //서버 로직 start
-      let id = pId
-      let password = pPassword;
-      password = Base64.btoa(password);
-
-      //id와 password로 DB검색
-      let user = await getUser(id, password);
-
-      //없을 경우
-      if(user.length === 0) {
-        return {status : 'ERROR', message : "아이디와 비밀번호를 확인하세요"};
-      }
-
-      //DB 무결성 에러
-      if(user.length !== 1) {
-        return {status : 'ERROR', message : "DB ERROR"};
-      }
-
-      let key = {
-        login : true,
-        id : result.id
-      }
-      key = Base64.btoa(JSON.stringify(key,0,2));
-
-      return {status : 'SUCCESS', data : {key : key}};
-    }
-
-    //서버 전송
-    result = await serverFn(this.state.id, this.state.password);
-    
+    //요청결과 에러인 경우
     if(result.status === 'ERROR'){
       alert(result.message);
+      this.setState({password : ''});
       return;
     }
-
-    //fetch 생략
-    const key = result.key;
-
+    //스토리지에 세션정보 저장
+    const key = result.data.key;
     try {
-      AsyncStorage.setItem('@RouteTestKey', key);
-      //넘어가기
-      this.props.navigation.navigate('page2');
+      await AsyncStorage.setItem('@RouteTest:key', key);
+      this.props.navigation.navigate('Page2');
     } catch (error) {
-      // Error saving data
+      alert("Error saving data" + error);
     }
-    // alert(key);
-
-    // alert(result)
-    // alert(Base64.atob(result[0].password));
-    
-    // alert(JSON.stringify(result,0,2));
   }
 
   render() {
